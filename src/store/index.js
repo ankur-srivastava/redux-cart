@@ -3,7 +3,8 @@ import { createSlice, configureStore } from '@reduxjs/toolkit'
 const initialCartState = {
     showCart: false,
     totalItems: 0,
-    items: []
+    items: [],
+    notification: null
 }
 
 const cartSlice = createSlice({
@@ -41,6 +42,13 @@ const cartSlice = createSlice({
                 existingItem.totalPrice = existingItem.totalPrice - existingItem.price
             }
             state.totalItems -= 1
+        },
+        showNotification(state, action) {
+            state.notification = {
+                status: action.payload.status,
+                title: action.payload.title,
+                decsription: action.payload.decsription
+            }
         }
     }
 })

@@ -1,48 +1,25 @@
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Cart from './components/Cart/Cart';
 import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
-import { cartActions } from './store';
 import Notification from './components/UI/Notification';
+import { sendCartData } from './store';
 
 function App() {
   const showCart = useSelector(state => state.showCart)
   const items = useSelector(state => state.items)
   const dispatch = useDispatch()
   const notification = useSelector(state => state.notification)
+  const [firstLoad, setFirstLoad] = useState(true)
 
   useEffect(()=>{
-    const sendData = async() => {
-      dispatch(cartActions.showNotification(
-        {
-          status: 'pending', 
-          title: 'Sending ...', 
-          decsription: 'sending cart data'
-        }))
-
-      const resp = await fetch('https://test-react-2fd9a-default-rtdb.firebaseio.com/cart.json', {
-        method: 'PUT',
-        body: JSON.stringify(items)
-      })
-      if(!resp || !resp.ok) {
-        throw new Error('Failed')
-      }
-      dispatch(cartActions.showNotification(
-        {
-          status: 'success', 
-          title: 'Success ...', 
-          decsription: 'Data Sent'
-        }))
+    if(firstLoad) {
+      console.log(firstLoad)
+      setFirstLoad(false)
+      return
     }
-    sendData().catch((e) => {
-      dispatch(cartActions.showNotification(
-        {
-          status: 'error', 
-          title: 'Error', 
-          decsription: 'Error while sending cart data'
-        }))
-    })
+    dispatch(sendCartData(items))
   }, [items, dispatch])
 
   return (

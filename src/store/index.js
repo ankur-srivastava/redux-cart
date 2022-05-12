@@ -53,6 +53,43 @@ const cartSlice = createSlice({
     }
 })
 
+// An action creator that works as a Thunk
+export const sendCartData = (items) => {
+    return async (dispatch) => {
+        dispatch(cartActions.showNotification({
+            status: 'pending',
+            title: 'Sending ...',
+            decsription: 'sending cart data'
+        }))
+
+        const sendRequest = async() => {
+            const resp = await fetch('https://test-react-2fd9a-default-rtdb.firebaseio.com/cart.json', {
+                method: 'PUT',
+                body: JSON.stringify(items)
+            })
+            if(!resp || !resp.ok) {
+                throw new Error('Failed')
+            }
+        }
+        
+        try {
+            await sendRequest()
+        } catch(e) {
+            dispatch(cartActions.showNotification({
+                status: 'error', 
+                title: 'Error', 
+                decsription: 'Error while sending cart data'
+            }))
+        }
+
+        dispatch(cartActions.showNotification({
+            status: 'success', 
+            title: 'Success ...', 
+            decsription: 'Data Sent'
+        }))
+    }
+}
+
 const store = configureStore({
     reducer: cartSlice.reducer
 })
